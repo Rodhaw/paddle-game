@@ -181,18 +181,18 @@
 
     onMount(() => {
         canvasContext = canvas.getContext("2d");
-        h = canvas.height;
-        w = canvas.width;
+        h = window.innerHeight*.8;
+        w = window.innerWidth*.8;
         canvasContext.lineWidth = 1;
         reset();
     });
 
     function resizeCanvas(){
-        if(h != canvas.height){
+        if(h != window.innerHeight*.8){
             debugger
         }
 
-        if(w != canvas.width){
+        if(w != window.innerWidth*.8){
             debugger
         }
     }

@@ -1,11 +1,19 @@
 <script>
-    import { onMount } from "svelte";
+    import { onMount, tick } from "svelte";
 
     let canvas;
     let canvasContext;
     let animationFrameId;
-    let h;
-    let w;
+    let heightDynamic = ()=>{
+        console.log(window.innerWidth);
+        return window.innerHeight*0.2;
+    };
+    let widthDynamic = ()=>{
+        console.log(window.innerHeight);
+        return window.innerWidth*0.2;
+    };
+    let height;
+    let width;
     let button;
 
     let game = {
@@ -126,10 +134,10 @@
         canvasContext.font = '50px arial';
         canvasContext.strokeStyle = "#ffffff";
         let textMetrics = canvasContext.measureText('You loose!');
-        canvasContext.strokeText("You Loose!", w/2-textMetrics.width/2, h/2);
+        canvasContext.strokeText("You Loose!", widthDynamic()/2-textMetrics.width/2, heightDynamic()/2);
         canvasContext.font = '30px arial';
         textMetrics = canvasContext.measureText('Press enter to continue.');
-        canvasContext.strokeText("Press enter to continue.", w/2-textMetrics.width/2, h/2+30);
+        canvasContext.strokeText("Press enter to continue.", widthDynamic()/2-textMetrics.width/2, heightDynamic()/2+30);
     }
 
     function youWin() {
@@ -138,25 +146,25 @@
         canvasContext.font = '50px arial';
         canvasContext.strokeStyle = "#ffffff";
         let textMetrics = canvasContext.measureText('You Win!');
-        canvasContext.strokeText("You Win!", w/2-textMetrics.width/2, h/2);
+        canvasContext.strokeText("You Win!", widthDynamic()/2-textMetrics.width/2, heightDynamic()/2);
         canvasContext.font = '30px arial';
         textMetrics = canvasContext.measureText('Press enter to continue.');
-        canvasContext.strokeText("Press enter to continue.", w/2-textMetrics.width/2, h/2+30);
+        canvasContext.strokeText("Press enter to continue.", widthDynamic()/2-textMetrics.width/2, heightDynamic()/2+30);
     }
 
     function reset() {
-        canvasContext.clearRect(0, 0, w, h);
+        canvasContext.clearRect(0, 0, widthDynamic(), heightDynamic());
         canvasContext.fillStyle = "#000";
-        canvasContext.fillRect(0, 0, w, h);
+        canvasContext.fillRect(0, 0, widthDynamic(), heightDynamic());
         game.level = 1;
-        game.padelLeft.x = w / 50 + 5;
-        game.padelLeft.y = h / 2 - game.padelLeft.heigth / 2;
-        game.padelRight.x = w - w / 50 - 5;
-        game.padelRight.y = h / 2 - game.padelLeft.heigth / 2;
-        game.ball.x = w / 2 - 5;
-        game.ball.y = h / 2 - 5;
-        game.ball.velocity.y = h * randomVelocity();
-        game.ball.velocity.x = w * randomVelocity();
+        game.padelLeft.x = widthDynamic() / 50 + 5;
+        game.padelLeft.y = heightDynamic() / 2 - game.padelLeft.heigth / 2;
+        game.padelRight.x = widthDynamic() - widthDynamic() / 50 - 5;
+        game.padelRight.y = heightDynamic() / 2 - game.padelLeft.heigth / 2;
+        game.ball.x = widthDynamic() / 2 - 5;
+        game.ball.y = heightDynamic() / 2 - 5;
+        game.ball.velocity.y = heightDynamic() * randomVelocity();
+        game.ball.velocity.x = widthDynamic() * randomVelocity();
         canvasContext.fillStyle = "#FFF";
         canvasContext.fillRect(
             game.padelLeft.x,
@@ -179,22 +187,20 @@
         //console.log(game.ball.velocity);
     }
 
-    onMount(() => {
+    onMount(async () => {
+        console.log(heightDynamic());
+        console.log(widthDynamic());
+        height = heightDynamic();
+        width = widthDynamic();
         canvasContext = canvas.getContext("2d");
-        h = window.innerHeight*.8;
-        w = window.innerWidth*.8;
         canvasContext.lineWidth = 1;
+        await tick();
         reset();
     });
 
     function resizeCanvas(){
-        if(h != window.innerHeight*.8){
-            debugger
-        }
-
-        if(w != window.innerWidth*.8){
-            debugger
-        }
+        canvas.height = heightDynamic();
+        canvas.width = widthDynamic();
     }
 
     function upLevel() {
@@ -210,7 +216,7 @@
         let xPosition = roundNumber(game.ball.velocity.x * game.seconds);
         if (
             game.ball.y + yPosition < 0 ||
-            game.ball.y + yPosition + game.ball.side > h
+            game.ball.y + yPosition + game.ball.side > heightDynamic()
         ) {
             game.ball.velocity.y *= -1;
         }
@@ -224,7 +230,7 @@
             game.ball.velocity.x *= -1 * rebound;
         } else if (game.ball.x < 0) {
             youLoose();
-        } else if (game.ball.x > w) {
+        } else if (game.ball.x > widthDynamic()) {
             youWin();
         }
 
@@ -243,7 +249,7 @@
                 game.padelRight.y -= adition;
             }
         } else if (game.ball.y > game.padelRight.y + game.padelRight.heigth) {
-            if (game.padelRight.y + adition < h) {
+            if (game.padelRight.y + adition < heightDynamic()) {
                 game.padelRight.y += adition;
             }
         }
@@ -257,9 +263,9 @@
                 0.001
             );
             game.oldTimestamp = timestamp;
-            canvasContext.clearRect(0, 0, w, h);
+            canvasContext.clearRect(0, 0, widthDynamic(), heightDynamic());
             canvasContext.fillStyle = "#000";
-            canvasContext.fillRect(0, 0, w, h);
+            canvasContext.fillRect(0, 0, widthDynamic(), heightDynamic());
             canvasContext.fillStyle = "#FFF";
             canvasContext.fillRect(
                 game.padelLeft.x,
@@ -292,7 +298,7 @@
                 game.padelLeft.y -= adition;
             }
         } else if ("down") {
-            if (game.padelLeft.y + game.padelLeft.heigth + adition < h) {
+            if (game.padelLeft.y + game.padelLeft.heigth + adition < heightDynamic()) {
                 game.padelLeft.y += adition;
             }
         }
@@ -358,6 +364,8 @@
     <button on:click={startGame} bind:this={button}>{game.state}</button>
     <canvas
         bind:this={canvas}
+        {width}
+        {height}
     />
     <div class="description">
         <p>Level: <span>{game.level}</span></p>
@@ -371,38 +379,30 @@
     </div>
 </div>
 
-<svelte:window on:keydown={handleUserAction} />
+<svelte:window on:keydown={handleUserAction} on:resize={resizeCanvas}/>
 
 <style>
     .game-container {
-        position: relative;
+        display: flex;
+        flex-direction: column;
     }
 
     button {
-        position: absolute;
-        top: 100px;
-        left: 150px;
+        
     }
 
     canvas {
-        position: absolute;
-        top: 200px;
-        left: 150px;
+        
     }
 
     .description {
-        position: absolute;
-        top: 700px;
-        left: 150px;
-        width: 1000px;
+       
         display: flex;
         flex-direction: row;
         justify-content: space-between;
     }
 
     .scores {
-        position: absolute;
-        top: 750px;
-        left: 150px;
+        
     }
 </style>

@@ -22,19 +22,29 @@
         padelRight: {
             x: 0,
             y: 0,
-            heigth: 50,
-            width: 10,
+            heigth: ()=>{
+                return height * 0.5;
+            },
+            width: ()=>{
+                return width * 0.2;
+            },
         },
         padelLeft: {
             x: 0,
             y: 0,
-            heigth: 50,
-            width: 10,
+            heigth: ()=>{
+                return height * 0.5;
+            },
+            width: ()=>{
+                return width * 0.5;
+            },
         },
         ball: {
             x: 0,
             y: 0,
-            side: 10,
+            side: ()=>{
+                return height * 0.1;
+            },
             acceleration: 1,
             velocity: {
                 x: 1,
@@ -131,40 +141,40 @@
         game.victory = "Loose";
         game.score.current = 0;
         pauseGame();
-        canvasContext.font = '50px arial';
+        canvasContext.font = `${0.5*height} arial`;
         canvasContext.strokeStyle = "#ffffff";
         let textMetrics = canvasContext.measureText('You loose!');
-        canvasContext.strokeText("You Loose!", widthDynamic()/2-textMetrics.width/2, heightDynamic()/2);
-        canvasContext.font = '30px arial';
+        canvasContext.strokeText("You Loose!", width/2-textMetrics.width/2, height/2);
+        canvasContext.font = `${0.2*height} arial`;;
         textMetrics = canvasContext.measureText('Press enter to continue.');
-        canvasContext.strokeText("Press enter to continue.", widthDynamic()/2-textMetrics.width/2, heightDynamic()/2+30);
+        canvasContext.strokeText("Press enter to continue.", width/2-textMetrics.width/2, height/2+30);
     }
 
     function youWin() {
         game.victory = "Win";
         pauseGame();
-        canvasContext.font = '50px arial';
+        canvasContext.font = `${0.1*height}px arial`;
         canvasContext.strokeStyle = "#ffffff";
         let textMetrics = canvasContext.measureText('You Win!');
-        canvasContext.strokeText("You Win!", widthDynamic()/2-textMetrics.width/2, heightDynamic()/2);
+        canvasContext.strokeText("You Win!", width/2-textMetrics.width/2, height/2);
         canvasContext.font = '30px arial';
         textMetrics = canvasContext.measureText('Press enter to continue.');
-        canvasContext.strokeText("Press enter to continue.", widthDynamic()/2-textMetrics.width/2, heightDynamic()/2+30);
+        canvasContext.strokeText("Press enter to continue.", width/2-textMetrics.width/2, height/2+30);
     }
 
     function reset() {
-        canvasContext.clearRect(0, 0, widthDynamic(), heightDynamic());
+        canvasContext.clearRect(0, 0, width, height);
         canvasContext.fillStyle = "#000";
-        canvasContext.fillRect(0, 0, widthDynamic(), heightDynamic());
+        canvasContext.fillRect(0, 0, width, height);
         game.level = 1;
-        game.padelLeft.x = widthDynamic() / 50 + 5;
-        game.padelLeft.y = heightDynamic() / 2 - game.padelLeft.heigth / 2;
-        game.padelRight.x = widthDynamic() - widthDynamic() / 50 - 5;
-        game.padelRight.y = heightDynamic() / 2 - game.padelLeft.heigth / 2;
-        game.ball.x = widthDynamic() / 2 - 5;
-        game.ball.y = heightDynamic() / 2 - 5;
-        game.ball.velocity.y = heightDynamic() * randomVelocity();
-        game.ball.velocity.x = widthDynamic() * randomVelocity();
+        game.padelLeft.x = width / 50 + 5;
+        game.padelLeft.y = height / 2 - game.padelLeft.heigth() / 2;
+        game.padelRight.x = width - width / 50 - 5;
+        game.padelRight.y = height / 2 - game.padelLeft.heigth() / 2;
+        game.ball.x = width / 2 - 5;
+        game.ball.y = height / 2 - 5;
+        game.ball.velocity.y = height * randomVelocity();
+        game.ball.velocity.x = width * randomVelocity();
         canvasContext.fillStyle = "#FFF";
         canvasContext.fillRect(
             game.padelLeft.x,
@@ -188,10 +198,8 @@
     }
 
     onMount(async () => {
-        console.log(heightDynamic());
-        console.log(widthDynamic());
-        height = heightDynamic();
-        width = widthDynamic();
+        height = canvas.height;
+        width = canvas.width;
         canvasContext = canvas.getContext("2d");
         canvasContext.lineWidth = 1;
         await tick();
@@ -199,8 +207,8 @@
     });
 
     function resizeCanvas(){
-        canvas.height = heightDynamic();
-        canvas.width = widthDynamic();
+        height = heightDynamic();
+        width = widthDynamic();
     }
 
     function upLevel() {
@@ -216,7 +224,7 @@
         let xPosition = roundNumber(game.ball.velocity.x * game.seconds);
         if (
             game.ball.y + yPosition < 0 ||
-            game.ball.y + yPosition + game.ball.side > heightDynamic()
+            game.ball.y + yPosition + game.ball.side() > height
         ) {
             game.ball.velocity.y *= -1;
         }
@@ -230,7 +238,7 @@
             game.ball.velocity.x *= -1 * rebound;
         } else if (game.ball.x < 0) {
             youLoose();
-        } else if (game.ball.x > widthDynamic()) {
+        } else if (game.ball.x > width) {
             youWin();
         }
 
@@ -244,12 +252,12 @@
 
     function aiRightPadel() {
         let adition = game.velocity.currentAi * game.seconds;
-        if (game.ball.y < game.padelRight.y + game.padelRight.heigth / 2) {
+        if (game.ball.y < game.padelRight.y + game.padelRight.heigth() / 2) {
             if (game.padelRight.y - adition > 0) {
                 game.padelRight.y -= adition;
             }
-        } else if (game.ball.y > game.padelRight.y + game.padelRight.heigth) {
-            if (game.padelRight.y + adition < heightDynamic()) {
+        } else if (game.ball.y > game.padelRight.y + game.padelRight.heigth()) {
+            if (game.padelRight.y + adition < height) {
                 game.padelRight.y += adition;
             }
         }
@@ -263,9 +271,9 @@
                 0.001
             );
             game.oldTimestamp = timestamp;
-            canvasContext.clearRect(0, 0, widthDynamic(), heightDynamic());
+            canvasContext.clearRect(0, 0, width, height);
             canvasContext.fillStyle = "#000";
-            canvasContext.fillRect(0, 0, widthDynamic(), heightDynamic());
+            canvasContext.fillRect(0, 0, width, height);
             canvasContext.fillStyle = "#FFF";
             canvasContext.fillRect(
                 game.padelLeft.x,
@@ -298,7 +306,7 @@
                 game.padelLeft.y -= adition;
             }
         } else if ("down") {
-            if (game.padelLeft.y + game.padelLeft.heigth + adition < heightDynamic()) {
+            if (game.padelLeft.y + game.padelLeft.heigth() + adition < height) {
                 game.padelLeft.y += adition;
             }
         }
@@ -364,8 +372,7 @@
     <button on:click={startGame} bind:this={button}>{game.state}</button>
     <canvas
         bind:this={canvas}
-        {width}
-        {height}
+        
     />
     <div class="description">
         <p>Level: <span>{game.level}</span></p>
@@ -379,7 +386,7 @@
     </div>
 </div>
 
-<svelte:window on:keydown={handleUserAction} on:resize={resizeCanvas}/>
+<svelte:window on:keydown={handleUserAction} />
 
 <style>
     .game-container {
@@ -392,7 +399,8 @@
     }
 
     canvas {
-        
+        height: 30%;
+        width: 100%;
     }
 
     .description {

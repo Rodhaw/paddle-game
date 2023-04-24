@@ -1,0 +1,2 @@
+
+How to base width and height of canvas rendered elements to the canvas height and width and also allowing the canvas to resize dynamically?

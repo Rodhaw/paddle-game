@@ -5,11 +5,9 @@
     let canvasContext;
     let animationFrameId;
     let heightDynamic = ()=>{
-        console.log(window.innerWidth);
         return window.innerHeight*0.2;
     };
     let widthDynamic = ()=>{
-        console.log(window.innerHeight);
         return window.innerWidth*0.2;
     };
     let height;
@@ -207,6 +205,7 @@
     });
 
     function resizeCanvas(){
+        canvasContext = canvas.getContext("2d");
         height = heightDynamic();
         width = widthDynamic();
     }

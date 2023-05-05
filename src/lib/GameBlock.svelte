@@ -210,7 +210,6 @@
             width / 2 - textMetrics.width / 2,
             height / 2 + 30
         );
-        debugger;
     }
 
     function youWin() {
@@ -231,7 +230,6 @@
             width / 2 - textMetrics.width / 2,
             height / 2 + 30
         );
-        debugger;
     }
 
     function reset() {
@@ -285,10 +283,6 @@
             game.ball.side(),
             game.ball.side()
         );
-    }
-
-    function resizeDrawContext() {
-        canvasContext = canvas.getContext("2d");
     }
 
     function upLevel() {

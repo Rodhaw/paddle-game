@@ -1,5 +1,5 @@
 <header>
-    <h1>Padel Game</h1>
+    <h1>Paddel Game</h1>
     <h2>Have old timer fun!</h2>
 </header>
 
